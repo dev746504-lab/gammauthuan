@@ -1,0 +1,18 @@
+[
+  { "pairId": 1, "word": "Mạnh", "emoji": "💪" },
+  { "pairId": 1, "word": "Yếu", "emoji": "🤕" },
+  { "pairId": 2, "word": "Sạch", "emoji": "🧼" },
+  { "pairId": 2, "word": "Bẩn", "emoji": "🐷" },
+  { "pairId": 3, "word": "Dễ", "emoji": "😊" },
+  { "pairId": 3, "word": "Khó", "emoji": "😣" },
+  { "pairId": 4, "word": "Gần", "emoji": "🤏" },
+  { "pairId": 4, "word": "Xa", "emoji": "🔭" },
+  { "pairId": 5, "word": "Mới", "emoji": "🆕" },
+  { "pairId": 5, "word": "Cũ", "emoji": "📦" },
+  { "pairId": 6, "word": "Ồn ào", "emoji": "📢" },
+  { "pairId": 6, "word": "Yên lặng", "emoji": "🤫" },
+  { "pairId": 7, "word": "Chăm chỉ", "emoji": "📚" },
+  { "pairId": 7, "word": "Lười biếng", "emoji": "🛌" },
+  { "pairId": 8, "word": "Dài", "emoji": "🐍" },
+  { "pairId": 8, "word": "Ngắn", "emoji": "🐛" }
+]

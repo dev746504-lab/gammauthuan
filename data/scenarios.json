@@ -1,0 +1,94 @@
+[
+  {
+    "id": 1,
+    "situation": "Bạn Hùng mượn cây bút chì mới của em nhưng lỡ làm gãy ngòi mà không nói gì. Em sẽ:",
+    "hint": "Hãy thử nghĩ xem cách nào không làm bạn buồn hơn nhé!",
+    "options": [
+      {
+        "id": "a",
+        "text": "Nói nhẹ nhàng: \"Cậu làm gãy bút của tớ rồi, lần sau cẩn thận hơn nhé\"",
+        "correct": true,
+        "explanation": "Chính xác! Nói ra cảm giác của mình một cách nhẹ nhàng giúp bạn hiểu và biết cẩn thận hơn, mà không ai phải giận nhau cả."
+      },
+      {
+        "id": "b",
+        "text": "Quát to lên với bạn ngay trước lớp",
+        "correct": false
+      },
+      {
+        "id": "c",
+        "text": "Không nói gì nhưng trong lòng giận bạn mãi",
+        "correct": false
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "situation": "Giờ ra chơi, em thấy bạn thân của mình đang chơi cùng một bạn khác mà không rủ em. Em sẽ:",
+    "hint": "Hãy thử nghĩ xem cách nào không làm bạn buồn hơn nhé!",
+    "options": [
+      {
+        "id": "a",
+        "text": "Giận dỗi, không thèm nói chuyện với bạn thân nữa",
+        "correct": false
+      },
+      {
+        "id": "b",
+        "text": "Hỏi xem em có thể cùng chơi không, hoặc vui vẻ tìm bạn khác để chơi cùng",
+        "correct": true,
+        "explanation": "Tuyệt vời! Bạn có thể chơi với nhiều người cùng lúc. Chủ động hỏi han hoặc tìm niềm vui riêng giúp em không buồn mà vẫn giữ được tình bạn."
+      },
+      {
+        "id": "c",
+        "text": "Nói xấu bạn kia với những người khác trong lớp",
+        "correct": false
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "situation": "Khi làm bài tập nhóm, em muốn vẽ tranh theo cách của mình nhưng bạn Hoa lại muốn làm theo cách khác. Em sẽ:",
+    "hint": "Hãy thử nghĩ xem cách nào không làm bạn buồn hơn nhé!",
+    "options": [
+      {
+        "id": "a",
+        "text": "Kiên quyết làm theo ý mình, không nghe bạn nói",
+        "correct": false
+      },
+      {
+        "id": "b",
+        "text": "Bỏ mặc, không làm bài nhóm nữa",
+        "correct": false
+      },
+      {
+        "id": "c",
+        "text": "Cùng bạn trao đổi để tìm ra cách làm mà cả hai đều thấy hợp lý",
+        "correct": true,
+        "explanation": "Rất khéo léo! Lắng nghe và trao đổi cùng nhau giúp cả nhóm tìm ra cách làm tốt nhất mà ai cũng vui, đó chính là cách làm việc nhóm giỏi đấy!"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "situation": "Trong lúc chơi đá bóng, bạn Tuấn vô tình đá bóng trúng người khiến em bị đau. Em sẽ:",
+    "hint": "Hãy thử nghĩ xem cách nào không làm bạn buồn hơn nhé!",
+    "options": [
+      {
+        "id": "a",
+        "text": "Đá bóng thật mạnh vào người bạn để trả đũa",
+        "correct": false
+      },
+      {
+        "id": "b",
+        "text": "Hiểu là bạn không cố ý, nhẹ nhàng nói với bạn là em bị đau",
+        "correct": true,
+        "explanation": "Đúng rồi! Hiểu rằng bạn không cố ý và nói ra cảm giác của mình một cách nhẹ nhàng giúp mọi chuyện được giải quyết êm đẹp, không biến thành mâu thuẫn lớn."
+      },
+      {
+        "id": "c",
+        "text": "Khóc lóc, la hét thật to giữa sân",
+        "correct": false
+      }
+    ]
+  }
+]

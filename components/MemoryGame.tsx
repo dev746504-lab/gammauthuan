@@ -1,0 +1,137 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import Card from "./Card";
+import Timer from "./Timer";
+import ScoreBadge from "./ScoreBadge";
+import ConfettiBurst from "./ConfettiBurst";
+import wordPairsData from "@/data/wordPairs.json";
+import { useGameSound } from "./SoundProvider";
+import type { Stage1Result, WordCardData } from "@/lib/types";
+
+const GAME_DURATION_SECONDS = 90;
+export const POINTS_PER_PAIR = 10;
+
+const wordPairs = wordPairsData as WordCardData[];
+const TOTAL_PAIRS = wordPairs.length / 2;
+
+type DeckCard = WordCardData & { cardId: string };
+
+function buildShuffledDeck(): DeckCard[] {
+  const deck: DeckCard[] = wordPairs.map((card, index) => ({
+    ...card,
+    cardId: `${card.pairId}-${index}`,
+  }));
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  return deck;
+}
+
+type MemoryGameProps = {
+  onComplete: (result: Stage1Result) => void;
+};
+
+export default function MemoryGame({ onComplete }: MemoryGameProps) {
+  const [deck] = useState<DeckCard[]>(() => buildShuffledDeck());
+  const [flippedIds, setFlippedIds] = useState<string[]>([]);
+  const [matchedPairIds, setMatchedPairIds] = useState<number[]>([]);
+  const [secondsLeft, setSecondsLeft] = useState(GAME_DURATION_SECONDS);
+  const [score, setScore] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+  const [showBurst, setShowBurst] = useState(false);
+  const finishedRef = useRef(false);
+  const sound = useGameSound();
+
+  const isComplete = matchedPairIds.length === TOTAL_PAIRS;
+
+  const finishGame = useCallback(() => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+    onComplete({
+      pairsFound: matchedPairIds.length,
+      totalPairs: TOTAL_PAIRS,
+      timeUsedSeconds: GAME_DURATION_SECONDS - secondsLeft,
+      score,
+    });
+  }, [matchedPairIds.length, secondsLeft, score, onComplete]);
+
+  useEffect(() => {
+    if (isComplete || secondsLeft <= 0) return;
+    const timerId = setInterval(() => {
+      setSecondsLeft((s) => Math.max(0, s - 1));
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, [isComplete, secondsLeft]);
+
+  useEffect(() => {
+    if (!isComplete && secondsLeft > 0) return;
+    const delay = isComplete ? 700 : 0;
+    const t = setTimeout(finishGame, delay);
+    return () => clearTimeout(t);
+  }, [isComplete, secondsLeft, finishGame]);
+
+  const handleCardClick = (card: DeckCard) => {
+    if (isLocked || flippedIds.includes(card.cardId) || matchedPairIds.includes(card.pairId)) return;
+    sound.playFlip();
+    const nextFlipped = [...flippedIds, card.cardId];
+    setFlippedIds(nextFlipped);
+
+    if (nextFlipped.length === 2) {
+      setIsLocked(true);
+      const first = deck.find((c) => c.cardId === nextFlipped[0])!;
+      const second = deck.find((c) => c.cardId === nextFlipped[1])!;
+
+      if (first.pairId === second.pairId) {
+        setTimeout(() => {
+          setMatchedPairIds((prev) => [...prev, first.pairId]);
+          setScore((s) => s + POINTS_PER_PAIR);
+          setFlippedIds([]);
+          setIsLocked(false);
+          sound.playCorrect();
+          setShowBurst(true);
+          setTimeout(() => setShowBurst(false), 900);
+        }, 350);
+      } else {
+        setTimeout(() => {
+          setFlippedIds([]);
+          setIsLocked(false);
+          sound.playIncorrect();
+        }, 1000);
+      }
+    }
+  };
+
+  return (
+    <div className="relative mx-auto flex w-full max-w-xl flex-col items-center gap-3 px-4 sm:max-w-2xl">
+      <div className="flex w-full items-center justify-between gap-2">
+        <ScoreBadge score={score} />
+        <p className="hidden text-center text-sm font-bold text-white drop-shadow sm:block sm:text-base">
+          Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
+        </p>
+        <Timer secondsLeft={secondsLeft} />
+      </div>
+      <p className="text-sm font-bold text-white drop-shadow sm:hidden">
+        Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
+      </p>
+
+      <div className="relative w-full rounded-3xl bg-white/95 p-3 shadow-2xl sm:p-4">
+        {showBurst && <ConfettiBurst />}
+        <div className="grid w-full grid-cols-4 gap-2 sm:gap-3">
+          {deck.map((card) => (
+            <Card
+              key={card.cardId}
+              word={card.word}
+              emoji={card.emoji}
+              isFlipped={flippedIds.includes(card.cardId)}
+              isMatched={matchedPairIds.includes(card.pairId)}
+              disabled={isLocked}
+              onClick={() => handleCardClick(card)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
