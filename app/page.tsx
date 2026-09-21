@@ -9,19 +9,23 @@ import ResultScreen from "@/components/ResultScreen";
 import TransitionMessage from "@/components/TransitionMessage";
 import QuizGame from "@/components/QuizGame";
 import { POINTS_PER_QUESTION } from "@/components/QuizQuestion";
+import ConflictSortStage, { POINTS_PER_CARD } from "@/components/ConflictSortStage";
+import CauseSummaryCard from "@/components/CauseSummaryCard";
 import FinalResult from "@/components/FinalResult";
 import { useGameState } from "@/hooks/useGameState";
 import wordPairsData from "@/data/wordPairs.json";
 import scenariosData from "@/data/scenarios.json";
+import conflictSituationsData from "@/data/conflictSituations.json";
 
 const TOTAL_PAIRS = wordPairsData.length / 2;
 const STAGE1_MAX_SCORE = TOTAL_PAIRS * POINTS_PER_PAIR;
 const STAGE2_MAX_SCORE = scenariosData.length * POINTS_PER_QUESTION;
-const MAX_SCORE = STAGE1_MAX_SCORE + STAGE2_MAX_SCORE;
+const STAGE3_MAX_SCORE = conflictSituationsData.length * POINTS_PER_CARD;
+const MAX_SCORE = STAGE1_MAX_SCORE + STAGE2_MAX_SCORE + STAGE3_MAX_SCORE;
 
 export default function Home() {
   const { state, dispatch } = useGameState();
-  const totalScore = (state.stage1Result?.score ?? 0) + state.stage2Score;
+  const totalScore = (state.stage1Result?.score ?? 0) + state.stage2Score + state.stage3Score;
 
   return (
     <SoundProvider>
@@ -72,6 +76,26 @@ export default function Home() {
                   })
                 }
               />
+            </motion.div>
+          )}
+
+          {state.stage === "stage3" && (
+            <motion.div key="stage3" exit={{ opacity: 0 }} className="w-full">
+              <ConflictSortStage
+                onComplete={(result) =>
+                  dispatch({
+                    type: "FINISH_STAGE3",
+                    score: result.score,
+                    correctCount: result.correctCount,
+                  })
+                }
+              />
+            </motion.div>
+          )}
+
+          {state.stage === "stage3-summary" && (
+            <motion.div key="stage3-summary" exit={{ opacity: 0 }} className="w-full">
+              <CauseSummaryCard onContinue={() => dispatch({ type: "CONTINUE_TO_FINAL" })} />
             </motion.div>
           )}
 

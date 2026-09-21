@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "text": "Khi hai người có ý kiến không giống nhau, không ai nhường ai.",
+    "isConflict": true,
+    "feedback": "Đúng rồi! Bất đồng ý kiến mà không ai nhường là nguyên nhân rất dễ gây mâu thuẫn đấy."
+  },
+  {
+    "id": 2,
+    "text": "Khi em cảm thấy người kia phách lối, hống hách.",
+    "isConflict": true,
+    "feedback": "Chính xác! Thái độ phách lối, hống hách dễ khiến bạn bè cảm thấy khó chịu và nảy sinh mâu thuẫn."
+  },
+  {
+    "id": 3,
+    "text": "Bạn em giúp đỡ em trong học tập.",
+    "isConflict": false,
+    "feedback": "Đúng vậy! Giúp đỡ nhau trong học tập giúp tình bạn thêm gắn bó, không hề gây mâu thuẫn."
+  },
+  {
+    "id": 4,
+    "text": "Khi em nghe nói có bạn nói xấu em.",
+    "isConflict": true,
+    "feedback": "Đúng rồi! Nghe nói xấu sau lưng rất dễ gây hiểu lầm và giận nhau nếu không nói chuyện thẳng thắn."
+  },
+  {
+    "id": 5,
+    "text": "Khi cảm xúc của em không được tốt và em nghĩ mọi người không hiểu em.",
+    "isConflict": true,
+    "feedback": "Chính xác! Khi tâm trạng không tốt và cảm thấy không ai hiểu mình, ta rất dễ nổi nóng và gây mâu thuẫn với bạn."
+  },
+  {
+    "id": 6,
+    "text": "Em đề nghị bạn giúp đỡ và bạn sẵn sàng giúp đỡ em.",
+    "isConflict": false,
+    "feedback": "Đúng vậy! Sẵn sàng giúp đỡ nhau khi được nhờ là biểu hiện của một tình bạn tốt đẹp."
+  }
+]

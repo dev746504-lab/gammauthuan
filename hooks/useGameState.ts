@@ -8,6 +8,8 @@ export type GameState = {
   stage1Result: Stage1Result | null;
   stage2Score: number;
   stage2CorrectCount: number;
+  stage3Score: number;
+  stage3CorrectCount: number;
 };
 
 export type GameAction =
@@ -16,6 +18,8 @@ export type GameAction =
   | { type: "CONTINUE_TO_TRANSITION" }
   | { type: "START_STAGE2" }
   | { type: "FINISH_STAGE2"; score: number; correctCount: number }
+  | { type: "FINISH_STAGE3"; score: number; correctCount: number }
+  | { type: "CONTINUE_TO_FINAL" }
   | { type: "RESTART" };
 
 const initialState: GameState = {
@@ -23,6 +27,8 @@ const initialState: GameState = {
   stage1Result: null,
   stage2Score: 0,
   stage2CorrectCount: 0,
+  stage3Score: 0,
+  stage3CorrectCount: 0,
 };
 
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -38,10 +44,19 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case "FINISH_STAGE2":
       return {
         ...state,
-        stage: "final",
+        stage: "stage3",
         stage2Score: action.score,
         stage2CorrectCount: action.correctCount,
       };
+    case "FINISH_STAGE3":
+      return {
+        ...state,
+        stage: "stage3-summary",
+        stage3Score: action.score,
+        stage3CorrectCount: action.correctCount,
+      };
+    case "CONTINUE_TO_FINAL":
+      return { ...state, stage: "final" };
     case "RESTART":
       return initialState;
     default:
