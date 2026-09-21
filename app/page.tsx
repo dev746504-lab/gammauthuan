@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { SoundProvider } from "@/components/SoundProvider";
 import SoundToggle from "@/components/SoundToggle";
 import IntroScreen from "@/components/IntroScreen";
+import StageSelectScreen from "@/components/StageSelectScreen";
+import StageCompleteCard from "@/components/StageCompleteCard";
 import MemoryGame, { POINTS_PER_PAIR } from "@/components/MemoryGame";
 import ResultScreen from "@/components/ResultScreen";
 import TransitionMessage from "@/components/TransitionMessage";
@@ -37,7 +39,21 @@ export default function Home() {
         <AnimatePresence mode="wait">
           {state.stage === "intro" && (
             <motion.div key="intro" exit={{ opacity: 0 }} className="w-full">
-              <IntroScreen onStart={() => dispatch({ type: "START_GAME" })} />
+              <IntroScreen
+                onStart={() => dispatch({ type: "START_GAME" })}
+                onChooseStage={() => dispatch({ type: "SHOW_STAGE_SELECT" })}
+              />
+            </motion.div>
+          )}
+
+          {state.stage === "stage-select" && (
+            <motion.div key="stage-select" exit={{ opacity: 0 }} className="w-full">
+              <StageSelectScreen
+                onSelectStage={(stageNumber) =>
+                  dispatch({ type: "START_PRACTICE_STAGE", stageNumber })
+                }
+                onBack={() => dispatch({ type: "RESTART" })}
+              />
             </motion.div>
           )}
 
@@ -75,6 +91,16 @@ export default function Home() {
                     correctCount: result.correctCount,
                   })
                 }
+              />
+            </motion.div>
+          )}
+
+          {state.stage === "stage2-complete" && (
+            <motion.div key="stage2-complete" exit={{ opacity: 0 }} className="w-full">
+              <StageCompleteCard
+                title="Hoàn thành Chặng 2!"
+                score={state.stage2Score}
+                onContinue={() => dispatch({ type: "BACK_TO_STAGE_SELECT" })}
               />
             </motion.div>
           )}

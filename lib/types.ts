@@ -27,13 +27,17 @@ export type ConflictSituation = {
 
 export type GameStage =
   | "intro"
+  | "stage-select"
   | "stage1"
   | "stage1-result"
   | "transition"
   | "stage2"
+  | "stage2-complete"
   | "stage3"
   | "stage3-summary"
   | "final";
+
+export type GameMode = "full" | "practice";
 
 export type Stage1Result = {
   pairsFound: number;
