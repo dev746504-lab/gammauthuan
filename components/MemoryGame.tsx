@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Card from "./Card";
 import Timer from "./Timer";
-import TeamScoreboard from "./TeamScoreboard";
 import ConfettiBurst from "./ConfettiBurst";
 import wordPairsData from "@/data/wordPairs.json";
 import { useGameSound } from "./SoundProvider";
@@ -29,12 +28,10 @@ function buildShuffledDeck(): DeckCard[] {
 }
 
 type MemoryGameProps = {
-  teamScores: number[];
-  onAdjustTeamScore: (teamId: number, delta: number) => void;
   onComplete: (stats: Stage1Stats) => void;
 };
 
-export default function MemoryGame({ teamScores, onAdjustTeamScore, onComplete }: MemoryGameProps) {
+export default function MemoryGame({ onComplete }: MemoryGameProps) {
   const [deck] = useState<DeckCard[]>(() => buildShuffledDeck());
   const [flippedIds, setFlippedIds] = useState<string[]>([]);
   const [matchedPairIds, setMatchedPairIds] = useState<number[]>([]);
@@ -103,14 +100,11 @@ export default function MemoryGame({ teamScores, onAdjustTeamScore, onComplete }
 
   return (
     <div className="relative mx-auto flex w-full max-w-xl flex-col gap-3 px-4 sm:max-w-2xl">
-      <div className="flex w-full flex-col gap-2">
-        <TeamScoreboard scores={teamScores} onAdjustScore={onAdjustTeamScore} />
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-bold text-white drop-shadow sm:text-base">
-            Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
-          </p>
-          <Timer secondsLeft={secondsLeft} />
-        </div>
+      <div className="flex w-full items-center justify-between gap-2">
+        <p className="text-sm font-bold text-white drop-shadow sm:text-base">
+          Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
+        </p>
+        <Timer secondsLeft={secondsLeft} />
       </div>
 
       <div className="relative w-full rounded-3xl bg-white/95 p-3 shadow-2xl sm:p-4">

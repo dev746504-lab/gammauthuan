@@ -3,11 +3,10 @@
 import { motion } from "framer-motion";
 
 type IntroScreenProps = {
-  onStart: () => void;
   onChooseStage: () => void;
 };
 
-export default function IntroScreen({ onStart, onChooseStage }: IntroScreenProps) {
+export default function IntroScreen({ onChooseStage }: IntroScreenProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,22 +36,13 @@ export default function IntroScreen({ onStart, onChooseStage }: IntroScreenProps
         </div>
       </div>
 
-      <div className="flex w-full flex-col items-center gap-3">
-        <button
-          type="button"
-          onClick={onStart}
-          className="w-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-orange-400 px-10 py-4 text-xl font-extrabold text-white shadow-lg transition hover:scale-105 active:scale-95 sm:w-auto"
-        >
-          Bắt đầu chơi
-        </button>
-        <button
-          type="button"
-          onClick={onChooseStage}
-          className="w-full rounded-full border-2 border-violet-200 bg-white px-8 py-3 text-base font-bold text-violet-600 transition hover:scale-105 hover:bg-violet-50 active:scale-95 sm:w-auto"
-        >
-          🎯 Chọn chặng chơi
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={onChooseStage}
+        className="w-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-orange-400 px-10 py-4 text-xl font-extrabold text-white shadow-lg transition hover:scale-105 active:scale-95 sm:w-auto"
+      >
+        🎯 Chọn chặng chơi
+      </button>
     </motion.div>
   );
 }

@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import DraggableSituationCard from "./DraggableSituationCard";
 import DropZone from "./DropZone";
 import Timer from "./Timer";
-import TeamScoreboard from "./TeamScoreboard";
 import ConfettiBurst from "./ConfettiBurst";
 import conflictSituationsData from "@/data/conflictSituations.json";
 import { useGameSound } from "./SoundProvider";
@@ -30,16 +29,10 @@ function isPointInRect(point: Point, rect: DOMRect, padding = 16): boolean {
 }
 
 type ConflictSortStageProps = {
-  teamScores: number[];
-  onAdjustTeamScore: (teamId: number, delta: number) => void;
   onComplete: (stats: Stage3Stats) => void;
 };
 
-export default function ConflictSortStage({
-  teamScores,
-  onAdjustTeamScore,
-  onComplete,
-}: ConflictSortStageProps) {
+export default function ConflictSortStage({ onComplete }: ConflictSortStageProps) {
   const [index, setIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(STAGE_DURATION_SECONDS);
@@ -119,14 +112,11 @@ export default function ConflictSortStage({
 
   return (
     <div className="relative mx-auto flex w-full max-w-xl flex-col gap-3 px-4 sm:max-w-2xl">
-      <div className="flex w-full flex-col gap-2">
-        <TeamScoreboard scores={teamScores} onAdjustScore={onAdjustTeamScore} />
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-bold text-white drop-shadow sm:text-base">
-            Đã phân loại {correctCount}/{TOTAL_CARDS} thẻ
-          </p>
-          <Timer secondsLeft={secondsLeft} />
-        </div>
+      <div className="flex w-full items-center justify-between gap-2">
+        <p className="text-sm font-bold text-white drop-shadow sm:text-base">
+          Đã phân loại {correctCount}/{TOTAL_CARDS} thẻ
+        </p>
+        <Timer secondsLeft={secondsLeft} />
       </div>
 
       <div

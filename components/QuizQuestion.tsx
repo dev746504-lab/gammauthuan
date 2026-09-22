@@ -5,15 +5,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Scenario } from "@/lib/types";
 import { useGameSound } from "./SoundProvider";
 import ConfettiBurst from "./ConfettiBurst";
-import TeamScoreboard from "./TeamScoreboard";
 
 type QuizQuestionProps = {
   scenario: Scenario;
   questionNumber: number;
   totalQuestions: number;
   isLast: boolean;
-  teamScores: number[];
-  onAdjustTeamScore: (teamId: number, delta: number) => void;
   onCorrectAnswer: () => void;
   onNext: () => void;
 };
@@ -23,8 +20,6 @@ export default function QuizQuestion({
   questionNumber,
   totalQuestions,
   isLast,
-  teamScores,
-  onAdjustTeamScore,
   onCorrectAnswer,
   onNext,
 }: QuizQuestionProps) {
@@ -63,12 +58,9 @@ export default function QuizQuestion({
     >
       {showBurst && <ConfettiBurst />}
 
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-bold uppercase tracking-wide text-violet-500">
-          Tình huống {questionNumber}/{totalQuestions}
-        </p>
-        <TeamScoreboard scores={teamScores} onAdjustScore={onAdjustTeamScore} />
-      </div>
+      <p className="text-sm font-bold uppercase tracking-wide text-violet-500">
+        Tình huống {questionNumber}/{totalQuestions}
+      </p>
 
       <p className="text-xl font-extrabold leading-relaxed text-slate-800 sm:text-2xl">
         {scenario.situation}

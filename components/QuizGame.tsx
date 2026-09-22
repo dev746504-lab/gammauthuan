@@ -9,12 +9,10 @@ import type { Scenario, Stage2Stats } from "@/lib/types";
 const scenarios = scenariosData as Scenario[];
 
 type QuizGameProps = {
-  teamScores: number[];
-  onAdjustTeamScore: (teamId: number, delta: number) => void;
   onComplete: (stats: Stage2Stats) => void;
 };
 
-export default function QuizGame({ teamScores, onAdjustTeamScore, onComplete }: QuizGameProps) {
+export default function QuizGame({ onComplete }: QuizGameProps) {
   const [index, setIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
 
@@ -42,8 +40,6 @@ export default function QuizGame({ teamScores, onAdjustTeamScore, onComplete }: 
           questionNumber={index + 1}
           totalQuestions={scenarios.length}
           isLast={isLast}
-          teamScores={teamScores}
-          onAdjustTeamScore={onAdjustTeamScore}
           onCorrectAnswer={handleCorrectAnswer}
           onNext={handleNext}
         />

@@ -8,17 +8,14 @@ import StageSelectScreen from "@/components/StageSelectScreen";
 import StageCompleteCard from "@/components/StageCompleteCard";
 import MemoryGame from "@/components/MemoryGame";
 import ResultScreen from "@/components/ResultScreen";
-import TransitionMessage from "@/components/TransitionMessage";
 import QuizGame from "@/components/QuizGame";
 import ConflictSortStage from "@/components/ConflictSortStage";
 import CauseSummaryCard from "@/components/CauseSummaryCard";
-import FinalResult from "@/components/FinalResult";
 import { useGameState } from "@/hooks/useGameState";
 
 export default function Home() {
   const { state, dispatch } = useGameState();
-  const onAdjustTeamScore = (teamId: number, delta: number) =>
-    dispatch({ type: "ADJUST_TEAM_SCORE", teamId, delta });
+  const backToStageSelect = () => dispatch({ type: "BACK_TO_STAGE_SELECT" });
 
   return (
     <SoundProvider>
@@ -30,19 +27,14 @@ export default function Home() {
         <AnimatePresence mode="wait">
           {state.stage === "intro" && (
             <motion.div key="intro" exit={{ opacity: 0 }} className="w-full">
-              <IntroScreen
-                onStart={() => dispatch({ type: "START_GAME" })}
-                onChooseStage={() => dispatch({ type: "SHOW_STAGE_SELECT" })}
-              />
+              <IntroScreen onChooseStage={() => dispatch({ type: "SHOW_STAGE_SELECT" })} />
             </motion.div>
           )}
 
           {state.stage === "stage-select" && (
             <motion.div key="stage-select" exit={{ opacity: 0 }} className="w-full">
               <StageSelectScreen
-                onSelectStage={(stageNumber) =>
-                  dispatch({ type: "START_PRACTICE_STAGE", stageNumber })
-                }
+                onSelectStage={(stageNumber) => dispatch({ type: "SELECT_STAGE", stageNumber })}
                 onBack={() => dispatch({ type: "RESTART" })}
               />
             </motion.div>
@@ -50,11 +42,7 @@ export default function Home() {
 
           {state.stage === "stage1" && (
             <motion.div key="stage1" exit={{ opacity: 0 }} className="w-full">
-              <MemoryGame
-                teamScores={state.teamScores}
-                onAdjustTeamScore={onAdjustTeamScore}
-                onComplete={(stats) => dispatch({ type: "FINISH_STAGE1", stats })}
-              />
+              <MemoryGame onComplete={(stats) => dispatch({ type: "FINISH_STAGE1", stats })} />
             </motion.div>
           )}
 
@@ -64,24 +52,14 @@ export default function Home() {
                 pairsFound={state.stage1Stats.pairsFound}
                 totalPairs={state.stage1Stats.totalPairs}
                 timeUsedSeconds={state.stage1Stats.timeUsedSeconds}
-                onContinue={() => dispatch({ type: "CONTINUE_TO_TRANSITION" })}
+                onContinue={backToStageSelect}
               />
-            </motion.div>
-          )}
-
-          {state.stage === "transition" && (
-            <motion.div key="transition" exit={{ opacity: 0 }} className="w-full">
-              <TransitionMessage onContinue={() => dispatch({ type: "START_STAGE2" })} />
             </motion.div>
           )}
 
           {state.stage === "stage2" && (
             <motion.div key="stage2" exit={{ opacity: 0 }} className="w-full">
-              <QuizGame
-                teamScores={state.teamScores}
-                onAdjustTeamScore={onAdjustTeamScore}
-                onComplete={(stats) => dispatch({ type: "FINISH_STAGE2", stats })}
-              />
+              <QuizGame onComplete={(stats) => dispatch({ type: "FINISH_STAGE2", stats })} />
             </motion.div>
           )}
 
@@ -91,33 +69,20 @@ export default function Home() {
                 title="Hoàn thành Chặng 2!"
                 correctCount={state.stage2Stats.correctCount}
                 total={state.stage2Stats.totalScenarios}
-                onContinue={() => dispatch({ type: "BACK_TO_STAGE_SELECT" })}
+                onContinue={backToStageSelect}
               />
             </motion.div>
           )}
 
           {state.stage === "stage3" && (
             <motion.div key="stage3" exit={{ opacity: 0 }} className="w-full">
-              <ConflictSortStage
-                teamScores={state.teamScores}
-                onAdjustTeamScore={onAdjustTeamScore}
-                onComplete={(stats) => dispatch({ type: "FINISH_STAGE3", stats })}
-              />
+              <ConflictSortStage onComplete={(stats) => dispatch({ type: "FINISH_STAGE3", stats })} />
             </motion.div>
           )}
 
           {state.stage === "stage3-summary" && (
             <motion.div key="stage3-summary" exit={{ opacity: 0 }} className="w-full">
-              <CauseSummaryCard onContinue={() => dispatch({ type: "CONTINUE_TO_FINAL" })} />
-            </motion.div>
-          )}
-
-          {state.stage === "final" && (
-            <motion.div key="final" exit={{ opacity: 0 }} className="w-full">
-              <FinalResult
-                teamScores={state.teamScores}
-                onRestart={() => dispatch({ type: "RESTART" })}
-              />
+              <CauseSummaryCard onContinue={backToStageSelect} />
             </motion.div>
           )}
         </AnimatePresence>
