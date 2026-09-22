@@ -9,7 +9,7 @@ import wordPairsData from "@/data/wordPairs.json";
 import { useGameSound } from "./SoundProvider";
 import type { Stage1Result, WordCardData } from "@/lib/types";
 
-const GAME_DURATION_SECONDS = 90;
+const GAME_DURATION_SECONDS = 300;
 export const POINTS_PER_PAIR = 10;
 
 const wordPairs = wordPairsData as WordCardData[];
@@ -119,9 +119,10 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
       <div className="relative w-full rounded-3xl bg-white/95 p-3 shadow-2xl sm:p-4">
         {showBurst && <ConfettiBurst />}
         <div className="grid w-full grid-cols-4 gap-2 sm:gap-3">
-          {deck.map((card) => (
+          {deck.map((card, index) => (
             <Card
               key={card.cardId}
+              label={String.fromCharCode(65 + index)}
               word={card.word}
               emoji={card.emoji}
               isFlipped={flippedIds.includes(card.cardId)}

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 
 type CardProps = {
+  label: string;
   word: string;
   emoji: string;
   isFlipped: boolean;
@@ -11,7 +12,15 @@ type CardProps = {
   onClick: () => void;
 };
 
-export default function Card({ word, emoji, isFlipped, isMatched, disabled, onClick }: CardProps) {
+export default function Card({
+  label,
+  word,
+  emoji,
+  isFlipped,
+  isMatched,
+  disabled,
+  onClick,
+}: CardProps) {
   const isRevealed = isFlipped || isMatched;
 
   return (
@@ -19,13 +28,19 @@ export default function Card({ word, emoji, isFlipped, isMatched, disabled, onCl
       type="button"
       onClick={onClick}
       disabled={disabled || isRevealed}
-      aria-label={isRevealed ? word : "Thẻ úp"}
+      aria-label={isRevealed ? `Thẻ ${label}: ${word}` : `Thẻ ${label}, đang úp`}
       className={`relative aspect-square w-full [perspective:1000px] focus:outline-none focus-visible:ring-4 focus-visible:ring-white/70 ${
         isMatched ? "pointer-events-none" : ""
       }`}
       animate={isMatched ? { scale: 0, opacity: 0 } : { scale: 1, opacity: 1 }}
       transition={{ duration: 0.4, delay: isMatched ? 0.3 : 0, ease: "easeIn" }}
     >
+      <span
+        aria-hidden
+        className="absolute -left-1.5 -top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-extrabold text-violet-600 shadow-md sm:-left-2 sm:-top-2 sm:h-7 sm:w-7 sm:text-sm"
+      >
+        {label}
+      </span>
       <motion.div
         className="absolute inset-0 h-full w-full [transform-style:preserve-3d]"
         animate={{ rotateY: isRevealed ? 180 : 0 }}
