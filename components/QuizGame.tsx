@@ -3,32 +3,32 @@
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import QuizQuestion from "./QuizQuestion";
-import ScoreBadge from "./ScoreBadge";
 import scenariosData from "@/data/scenarios.json";
-import type { Scenario, Stage2Result } from "@/lib/types";
+import type { Scenario, Stage2Stats } from "@/lib/types";
 
 const scenarios = scenariosData as Scenario[];
 
 type QuizGameProps = {
-  onComplete: (result: Stage2Result) => void;
+  teamScores: number[];
+  onTeamScored: (teamId: number) => void;
+  onComplete: (stats: Stage2Stats) => void;
 };
 
-export default function QuizGame({ onComplete }: QuizGameProps) {
+export default function QuizGame({ teamScores, onTeamScored, onComplete }: QuizGameProps) {
   const [index, setIndex] = useState(0);
-  const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
 
   const current = scenarios[index];
   const isLast = index === scenarios.length - 1;
 
-  const handleCorrectAnswer = (points: number) => {
-    setScore((s) => s + points);
+  const handleTeamScored = (teamId: number) => {
     setCorrectCount((c) => c + 1);
+    onTeamScored(teamId);
   };
 
   const handleNext = () => {
     if (isLast) {
-      onComplete({ score, correctCount, totalScenarios: scenarios.length });
+      onComplete({ correctCount, totalScenarios: scenarios.length });
     } else {
       setIndex((i) => i + 1);
     }
@@ -36,9 +36,6 @@ export default function QuizGame({ onComplete }: QuizGameProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-4">
-      <div className="flex w-full justify-end">
-        <ScoreBadge score={score} />
-      </div>
       <AnimatePresence mode="wait">
         <QuizQuestion
           key={current.id}
@@ -46,7 +43,8 @@ export default function QuizGame({ onComplete }: QuizGameProps) {
           questionNumber={index + 1}
           totalQuestions={scenarios.length}
           isLast={isLast}
-          onCorrectAnswer={handleCorrectAnswer}
+          teamScores={teamScores}
+          onTeamScored={handleTeamScored}
           onNext={handleNext}
         />
       </AnimatePresence>

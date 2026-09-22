@@ -6,7 +6,6 @@ type ResultScreenProps = {
   pairsFound: number;
   totalPairs: number;
   timeUsedSeconds: number;
-  score: number;
   onContinue: () => void;
 };
 
@@ -14,7 +13,6 @@ export default function ResultScreen({
   pairsFound,
   totalPairs,
   timeUsedSeconds,
-  score,
   onContinue,
 }: ResultScreenProps) {
   const completedAll = pairsFound === totalPairs;
@@ -41,10 +39,6 @@ export default function ResultScreen({
           <p className="text-sm font-semibold text-amber-500">Thời gian</p>
           <p className="text-2xl font-bold text-amber-700">{timeUsedSeconds}s</p>
         </div>
-      </div>
-
-      <div className="rounded-2xl bg-emerald-50 px-6 py-3">
-        <p className="text-lg font-bold text-emerald-700">⭐ {score} điểm</p>
       </div>
 
       <button

@@ -1,27 +1,28 @@
 "use client";
 
 import { useReducer } from "react";
-import type { GameMode, GameStage, Stage1Result } from "@/lib/types";
+import { createEmptyTeamScores } from "@/lib/teams";
+import type { GameMode, GameStage, Stage1Stats, Stage2Stats, Stage3Stats } from "@/lib/types";
 
 export type GameState = {
   stage: GameStage;
   mode: GameMode;
-  stage1Result: Stage1Result | null;
-  stage2Score: number;
-  stage2CorrectCount: number;
-  stage3Score: number;
-  stage3CorrectCount: number;
+  teamScores: number[];
+  stage1Stats: Stage1Stats | null;
+  stage2Stats: Stage2Stats | null;
+  stage3Stats: Stage3Stats | null;
 };
 
 export type GameAction =
   | { type: "START_GAME" }
   | { type: "SHOW_STAGE_SELECT" }
   | { type: "START_PRACTICE_STAGE"; stageNumber: 1 | 2 | 3 }
-  | { type: "FINISH_STAGE1"; result: Stage1Result }
+  | { type: "SCORE_TEAM"; teamId: number }
+  | { type: "FINISH_STAGE1"; stats: Stage1Stats }
   | { type: "CONTINUE_TO_TRANSITION" }
   | { type: "START_STAGE2" }
-  | { type: "FINISH_STAGE2"; score: number; correctCount: number }
-  | { type: "FINISH_STAGE3"; score: number; correctCount: number }
+  | { type: "FINISH_STAGE2"; stats: Stage2Stats }
+  | { type: "FINISH_STAGE3"; stats: Stage3Stats }
   | { type: "CONTINUE_TO_FINAL" }
   | { type: "BACK_TO_STAGE_SELECT" }
   | { type: "RESTART" };
@@ -29,11 +30,10 @@ export type GameAction =
 const initialState: GameState = {
   stage: "intro",
   mode: "full",
-  stage1Result: null,
-  stage2Score: 0,
-  stage2CorrectCount: 0,
-  stage3Score: 0,
-  stage3CorrectCount: 0,
+  teamScores: createEmptyTeamScores(),
+  stage1Stats: null,
+  stage2Stats: null,
+  stage3Stats: null,
 };
 
 const PRACTICE_STAGE_MAP: Record<1 | 2 | 3, GameStage> = {
@@ -49,12 +49,24 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case "SHOW_STAGE_SELECT":
       return { ...initialState, stage: "stage-select" };
     case "START_PRACTICE_STAGE":
-      return { ...initialState, mode: "practice", stage: PRACTICE_STAGE_MAP[action.stageNumber] };
+      return {
+        ...state,
+        mode: "practice",
+        stage: PRACTICE_STAGE_MAP[action.stageNumber],
+        stage1Stats: null,
+        stage2Stats: null,
+        stage3Stats: null,
+      };
+    case "SCORE_TEAM": {
+      const nextScores = [...state.teamScores];
+      nextScores[action.teamId] = (nextScores[action.teamId] ?? 0) + 1;
+      return { ...state, teamScores: nextScores };
+    }
     case "FINISH_STAGE1":
-      return { ...state, stage: "stage1-result", stage1Result: action.result };
+      return { ...state, stage: "stage1-result", stage1Stats: action.stats };
     case "CONTINUE_TO_TRANSITION":
       return state.mode === "practice"
-        ? { ...initialState, stage: "stage-select" }
+        ? { ...state, stage: "stage-select" }
         : { ...state, stage: "transition" };
     case "START_STAGE2":
       return { ...state, stage: "stage2" };
@@ -62,22 +74,16 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         stage: state.mode === "practice" ? "stage2-complete" : "stage3",
-        stage2Score: action.score,
-        stage2CorrectCount: action.correctCount,
+        stage2Stats: action.stats,
       };
     case "FINISH_STAGE3":
-      return {
-        ...state,
-        stage: "stage3-summary",
-        stage3Score: action.score,
-        stage3CorrectCount: action.correctCount,
-      };
+      return { ...state, stage: "stage3-summary", stage3Stats: action.stats };
     case "CONTINUE_TO_FINAL":
       return state.mode === "practice"
-        ? { ...initialState, stage: "stage-select" }
+        ? { ...state, stage: "stage-select" }
         : { ...state, stage: "final" };
     case "BACK_TO_STAGE_SELECT":
-      return { ...initialState, stage: "stage-select" };
+      return { ...state, stage: "stage-select" };
     case "RESTART":
       return initialState;
     default:

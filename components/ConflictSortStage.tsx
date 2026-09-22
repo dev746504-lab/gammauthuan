@@ -5,18 +5,18 @@ import { AnimatePresence, motion } from "framer-motion";
 import DraggableSituationCard from "./DraggableSituationCard";
 import DropZone from "./DropZone";
 import Timer from "./Timer";
-import ScoreBadge from "./ScoreBadge";
+import TeamScoreboard from "./TeamScoreboard";
+import TeamPicker from "./TeamPicker";
 import ConfettiBurst from "./ConfettiBurst";
 import conflictSituationsData from "@/data/conflictSituations.json";
 import { useGameSound } from "./SoundProvider";
-import type { ConflictSituation, Stage3Result } from "@/lib/types";
+import type { ConflictSituation, Stage3Stats } from "@/lib/types";
 
 const situations = conflictSituationsData as ConflictSituation[];
 const TOTAL_CARDS = situations.length;
 const STAGE_DURATION_SECONDS = 90;
 const ADVANCE_DELAY_MS = 1300;
 const WRONG_HINT_DURATION_MS = 1600;
-export const POINTS_PER_CARD = 15;
 
 type Zone = "conflict" | "not-conflict";
 type Point = { x: number; y: number };
@@ -31,14 +31,20 @@ function isPointInRect(point: Point, rect: DOMRect, padding = 16): boolean {
 }
 
 type ConflictSortStageProps = {
-  onComplete: (result: Stage3Result) => void;
+  teamScores: number[];
+  onTeamScored: (teamId: number) => void;
+  onComplete: (stats: Stage3Stats) => void;
 };
 
-export default function ConflictSortStage({ onComplete }: ConflictSortStageProps) {
+export default function ConflictSortStage({
+  teamScores,
+  onTeamScored,
+  onComplete,
+}: ConflictSortStageProps) {
   const [index, setIndex] = useState(0);
-  const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(STAGE_DURATION_SECONDS);
+  const [activeTeamId, setActiveTeamId] = useState<number | null>(null);
   const [activeZone, setActiveZone] = useState<Zone | null>(null);
   const [returnSignal, setReturnSignal] = useState(0);
   const [wrongHint, setWrongHint] = useState(false);
@@ -75,7 +81,7 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
   };
 
   const handleDragRelease = (point: Point) => {
-    if (isBusy) return;
+    if (isBusy || activeTeamId === null) return;
     const zone = resolveZone(point);
     setActiveZone(null);
 
@@ -87,18 +93,18 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
       setFeedback(current.feedback);
       setShowBurst(true);
       sound.playCorrect();
+      onTeamScored(activeTeamId);
 
-      const newScore = score + POINTS_PER_CARD;
       const newCorrectCount = correctCount + 1;
-      setScore(newScore);
       setCorrectCount(newCorrectCount);
 
       setTimeout(() => {
         setShowBurst(false);
         setFeedback(null);
         setMatched(false);
+        setActiveTeamId(null); // Sang thẻ mới -> chọn đội lại.
         if (index + 1 >= TOTAL_CARDS) {
-          onComplete({ score: newScore, correctCount: newCorrectCount, totalCards: TOTAL_CARDS });
+          onComplete({ correctCount: newCorrectCount, totalCards: TOTAL_CARDS });
         } else {
           setIndex((i) => i + 1);
         }
@@ -108,6 +114,7 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
     }
 
     setReturnSignal((n) => n + 1);
+    setActiveTeamId(null); // Sai -> chuyển lượt, đội khác có thể giành thẻ này.
     if (zone) {
       sound.playIncorrect();
       setWrongHint(true);
@@ -117,16 +124,15 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
 
   return (
     <div className="relative mx-auto flex w-full max-w-xl flex-col gap-3 px-4 sm:max-w-2xl">
-      <div className="flex w-full items-center justify-between gap-2">
-        <ScoreBadge score={score} />
-        <p className="hidden text-center text-sm font-bold text-white drop-shadow sm:block sm:text-base">
-          Đã phân loại {correctCount}/{TOTAL_CARDS} thẻ
-        </p>
-        <Timer secondsLeft={secondsLeft} />
+      <div className="flex w-full flex-col gap-2">
+        <TeamScoreboard scores={teamScores} activeTeamId={activeTeamId} />
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-bold text-white drop-shadow sm:text-base">
+            Đã phân loại {correctCount}/{TOTAL_CARDS} thẻ
+          </p>
+          <Timer secondsLeft={secondsLeft} />
+        </div>
       </div>
-      <p className="text-sm font-bold text-white drop-shadow sm:hidden">
-        Đã phân loại {correctCount}/{TOTAL_CARDS} thẻ
-      </p>
 
       <div
         ref={panelRef}
@@ -153,7 +159,7 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
                 <DraggableSituationCard
                   key={current.id}
                   text={current.text}
-                  disabled={isBusy}
+                  disabled={isBusy || activeTeamId === null}
                   returnSignal={returnSignal}
                   dragConstraints={panelRef}
                   onDragMove={handleDragMove}
@@ -197,6 +203,12 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
             </motion.p>
           )}
         </AnimatePresence>
+
+        {activeTeamId === null && !matched && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center rounded-3xl bg-white/90 p-4">
+            <TeamPicker prompt="Đội nào phân loại thẻ này?" onSelectTeam={setActiveTeamId} />
+          </div>
+        )}
       </div>
     </div>
   );

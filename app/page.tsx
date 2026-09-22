@@ -6,28 +6,18 @@ import SoundToggle from "@/components/SoundToggle";
 import IntroScreen from "@/components/IntroScreen";
 import StageSelectScreen from "@/components/StageSelectScreen";
 import StageCompleteCard from "@/components/StageCompleteCard";
-import MemoryGame, { POINTS_PER_PAIR } from "@/components/MemoryGame";
+import MemoryGame from "@/components/MemoryGame";
 import ResultScreen from "@/components/ResultScreen";
 import TransitionMessage from "@/components/TransitionMessage";
 import QuizGame from "@/components/QuizGame";
-import { POINTS_PER_QUESTION } from "@/components/QuizQuestion";
-import ConflictSortStage, { POINTS_PER_CARD } from "@/components/ConflictSortStage";
+import ConflictSortStage from "@/components/ConflictSortStage";
 import CauseSummaryCard from "@/components/CauseSummaryCard";
 import FinalResult from "@/components/FinalResult";
 import { useGameState } from "@/hooks/useGameState";
-import wordPairsData from "@/data/wordPairs.json";
-import scenariosData from "@/data/scenarios.json";
-import conflictSituationsData from "@/data/conflictSituations.json";
-
-const TOTAL_PAIRS = wordPairsData.length / 2;
-const STAGE1_MAX_SCORE = TOTAL_PAIRS * POINTS_PER_PAIR;
-const STAGE2_MAX_SCORE = scenariosData.length * POINTS_PER_QUESTION;
-const STAGE3_MAX_SCORE = conflictSituationsData.length * POINTS_PER_CARD;
-const MAX_SCORE = STAGE1_MAX_SCORE + STAGE2_MAX_SCORE + STAGE3_MAX_SCORE;
 
 export default function Home() {
   const { state, dispatch } = useGameState();
-  const totalScore = (state.stage1Result?.score ?? 0) + state.stage2Score + state.stage3Score;
+  const onTeamScored = (teamId: number) => dispatch({ type: "SCORE_TEAM", teamId });
 
   return (
     <SoundProvider>
@@ -59,17 +49,20 @@ export default function Home() {
 
           {state.stage === "stage1" && (
             <motion.div key="stage1" exit={{ opacity: 0 }} className="w-full">
-              <MemoryGame onComplete={(result) => dispatch({ type: "FINISH_STAGE1", result })} />
+              <MemoryGame
+                teamScores={state.teamScores}
+                onTeamScored={onTeamScored}
+                onComplete={(stats) => dispatch({ type: "FINISH_STAGE1", stats })}
+              />
             </motion.div>
           )}
 
-          {state.stage === "stage1-result" && state.stage1Result && (
+          {state.stage === "stage1-result" && state.stage1Stats && (
             <motion.div key="stage1-result" exit={{ opacity: 0 }} className="w-full">
               <ResultScreen
-                pairsFound={state.stage1Result.pairsFound}
-                totalPairs={state.stage1Result.totalPairs}
-                timeUsedSeconds={state.stage1Result.timeUsedSeconds}
-                score={state.stage1Result.score}
+                pairsFound={state.stage1Stats.pairsFound}
+                totalPairs={state.stage1Stats.totalPairs}
+                timeUsedSeconds={state.stage1Stats.timeUsedSeconds}
                 onContinue={() => dispatch({ type: "CONTINUE_TO_TRANSITION" })}
               />
             </motion.div>
@@ -84,22 +77,19 @@ export default function Home() {
           {state.stage === "stage2" && (
             <motion.div key="stage2" exit={{ opacity: 0 }} className="w-full">
               <QuizGame
-                onComplete={(result) =>
-                  dispatch({
-                    type: "FINISH_STAGE2",
-                    score: result.score,
-                    correctCount: result.correctCount,
-                  })
-                }
+                teamScores={state.teamScores}
+                onTeamScored={onTeamScored}
+                onComplete={(stats) => dispatch({ type: "FINISH_STAGE2", stats })}
               />
             </motion.div>
           )}
 
-          {state.stage === "stage2-complete" && (
+          {state.stage === "stage2-complete" && state.stage2Stats && (
             <motion.div key="stage2-complete" exit={{ opacity: 0 }} className="w-full">
               <StageCompleteCard
                 title="Hoàn thành Chặng 2!"
-                score={state.stage2Score}
+                correctCount={state.stage2Stats.correctCount}
+                total={state.stage2Stats.totalScenarios}
                 onContinue={() => dispatch({ type: "BACK_TO_STAGE_SELECT" })}
               />
             </motion.div>
@@ -108,13 +98,9 @@ export default function Home() {
           {state.stage === "stage3" && (
             <motion.div key="stage3" exit={{ opacity: 0 }} className="w-full">
               <ConflictSortStage
-                onComplete={(result) =>
-                  dispatch({
-                    type: "FINISH_STAGE3",
-                    score: result.score,
-                    correctCount: result.correctCount,
-                  })
-                }
+                teamScores={state.teamScores}
+                onTeamScored={onTeamScored}
+                onComplete={(stats) => dispatch({ type: "FINISH_STAGE3", stats })}
               />
             </motion.div>
           )}
@@ -128,8 +114,7 @@ export default function Home() {
           {state.stage === "final" && (
             <motion.div key="final" exit={{ opacity: 0 }} className="w-full">
               <FinalResult
-                totalScore={totalScore}
-                maxScore={MAX_SCORE}
+                teamScores={state.teamScores}
                 onRestart={() => dispatch({ type: "RESTART" })}
               />
             </motion.div>

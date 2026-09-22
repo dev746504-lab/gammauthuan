@@ -5,11 +5,17 @@ import ConfettiBurst from "./ConfettiBurst";
 
 type StageCompleteCardProps = {
   title: string;
-  score: number;
+  correctCount: number;
+  total: number;
   onContinue: () => void;
 };
 
-export default function StageCompleteCard({ title, score, onContinue }: StageCompleteCardProps) {
+export default function StageCompleteCard({
+  title,
+  correctCount,
+  total,
+  onContinue,
+}: StageCompleteCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -20,7 +26,9 @@ export default function StageCompleteCard({ title, score, onContinue }: StageCom
       <span className="text-6xl">🎉</span>
       <h2 className="text-2xl font-extrabold text-slate-800 sm:text-3xl">{title}</h2>
       <div className="rounded-2xl bg-emerald-50 px-6 py-3">
-        <p className="text-lg font-bold text-emerald-700">⭐ {score} điểm</p>
+        <p className="text-lg font-bold text-emerald-700">
+          ✅ Trả lời đúng {correctCount}/{total} câu
+        </p>
       </div>
       <button
         type="button"

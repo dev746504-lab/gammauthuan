@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Card from "./Card";
 import Timer from "./Timer";
-import ScoreBadge from "./ScoreBadge";
+import TeamScoreboard from "./TeamScoreboard";
+import TeamPicker from "./TeamPicker";
 import ConfettiBurst from "./ConfettiBurst";
 import wordPairsData from "@/data/wordPairs.json";
 import { useGameSound } from "./SoundProvider";
-import type { Stage1Result, WordCardData } from "@/lib/types";
+import type { Stage1Stats, WordCardData } from "@/lib/types";
 
 const GAME_DURATION_SECONDS = 300;
-export const POINTS_PER_PAIR = 10;
 
 const wordPairs = wordPairsData as WordCardData[];
 const TOTAL_PAIRS = wordPairs.length / 2;
@@ -30,17 +30,19 @@ function buildShuffledDeck(): DeckCard[] {
 }
 
 type MemoryGameProps = {
-  onComplete: (result: Stage1Result) => void;
+  teamScores: number[];
+  onTeamScored: (teamId: number) => void;
+  onComplete: (stats: Stage1Stats) => void;
 };
 
-export default function MemoryGame({ onComplete }: MemoryGameProps) {
+export default function MemoryGame({ teamScores, onTeamScored, onComplete }: MemoryGameProps) {
   const [deck] = useState<DeckCard[]>(() => buildShuffledDeck());
   const [flippedIds, setFlippedIds] = useState<string[]>([]);
   const [matchedPairIds, setMatchedPairIds] = useState<number[]>([]);
   const [secondsLeft, setSecondsLeft] = useState(GAME_DURATION_SECONDS);
-  const [score, setScore] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [showBurst, setShowBurst] = useState(false);
+  const [activeTeamId, setActiveTeamId] = useState<number | null>(null);
   const finishedRef = useRef(false);
   const sound = useGameSound();
 
@@ -53,9 +55,8 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
       pairsFound: matchedPairIds.length,
       totalPairs: TOTAL_PAIRS,
       timeUsedSeconds: GAME_DURATION_SECONDS - secondsLeft,
-      score,
     });
-  }, [matchedPairIds.length, secondsLeft, score, onComplete]);
+  }, [matchedPairIds.length, secondsLeft, onComplete]);
 
   useEffect(() => {
     if (isComplete || secondsLeft <= 0) return;
@@ -73,6 +74,7 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
   }, [isComplete, secondsLeft, finishGame]);
 
   const handleCardClick = (card: DeckCard) => {
+    if (activeTeamId === null) return;
     if (isLocked || flippedIds.includes(card.cardId) || matchedPairIds.includes(card.pairId)) return;
     sound.playFlip();
     const nextFlipped = [...flippedIds, card.cardId];
@@ -82,39 +84,41 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
       setIsLocked(true);
       const first = deck.find((c) => c.cardId === nextFlipped[0])!;
       const second = deck.find((c) => c.cardId === nextFlipped[1])!;
+      const scoringTeamId = activeTeamId;
 
       if (first.pairId === second.pairId) {
         setTimeout(() => {
           setMatchedPairIds((prev) => [...prev, first.pairId]);
-          setScore((s) => s + POINTS_PER_PAIR);
+          onTeamScored(scoringTeamId);
           setFlippedIds([]);
           setIsLocked(false);
           sound.playCorrect();
           setShowBurst(true);
           setTimeout(() => setShowBurst(false), 900);
+          // Ghép đúng -> đội này được lật tiếp, không đổi lượt.
         }, 350);
       } else {
         setTimeout(() => {
           setFlippedIds([]);
           setIsLocked(false);
           sound.playIncorrect();
+          setActiveTeamId(null); // Sai -> chuyển lượt, chọn đội khác.
         }, 1000);
       }
     }
   };
 
   return (
-    <div className="relative mx-auto flex w-full max-w-xl flex-col items-center gap-3 px-4 sm:max-w-2xl">
-      <div className="flex w-full items-center justify-between gap-2">
-        <ScoreBadge score={score} />
-        <p className="hidden text-center text-sm font-bold text-white drop-shadow sm:block sm:text-base">
-          Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
-        </p>
-        <Timer secondsLeft={secondsLeft} />
+    <div className="relative mx-auto flex w-full max-w-xl flex-col gap-3 px-4 sm:max-w-2xl">
+      <div className="flex w-full flex-col gap-2">
+        <TeamScoreboard scores={teamScores} activeTeamId={activeTeamId} />
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-bold text-white drop-shadow sm:text-base">
+            Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
+          </p>
+          <Timer secondsLeft={secondsLeft} />
+        </div>
       </div>
-      <p className="text-sm font-bold text-white drop-shadow sm:hidden">
-        Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
-      </p>
 
       <div className="relative w-full rounded-3xl bg-white/95 p-3 shadow-2xl sm:p-4">
         {showBurst && <ConfettiBurst />}
@@ -127,11 +131,17 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
               emoji={card.emoji}
               isFlipped={flippedIds.includes(card.cardId)}
               isMatched={matchedPairIds.includes(card.pairId)}
-              disabled={isLocked}
+              disabled={isLocked || activeTeamId === null}
               onClick={() => handleCardClick(card)}
             />
           ))}
         </div>
+
+        {activeTeamId === null && !isComplete && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center rounded-3xl bg-white/90 p-4">
+            <TeamPicker prompt="Đội nào lật thẻ?" onSelectTeam={setActiveTeamId} />
+          </div>
+        )}
       </div>
     </div>
   );

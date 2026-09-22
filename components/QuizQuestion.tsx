@@ -5,15 +5,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { Scenario } from "@/lib/types";
 import { useGameSound } from "./SoundProvider";
 import ConfettiBurst from "./ConfettiBurst";
-
-export const POINTS_PER_QUESTION = 20;
+import TeamPicker from "./TeamPicker";
+import TeamScoreboard from "./TeamScoreboard";
 
 type QuizQuestionProps = {
   scenario: Scenario;
   questionNumber: number;
   totalQuestions: number;
   isLast: boolean;
-  onCorrectAnswer: (points: number) => void;
+  teamScores: number[];
+  onTeamScored: (teamId: number) => void;
   onNext: () => void;
 };
 
@@ -22,9 +23,11 @@ export default function QuizQuestion({
   questionNumber,
   totalQuestions,
   isLast,
-  onCorrectAnswer,
+  teamScores,
+  onTeamScored,
   onNext,
 }: QuizQuestionProps) {
+  const [activeTeamId, setActiveTeamId] = useState<number | null>(null);
   const [correctId, setCorrectId] = useState<string | null>(null);
   const [wrongIds, setWrongIds] = useState<string[]>([]);
   const [showHint, setShowHint] = useState(false);
@@ -35,7 +38,7 @@ export default function QuizQuestion({
   const isAnswered = correctId !== null;
 
   const handleSelect = (optionId: string) => {
-    if (isAnswered) return;
+    if (isAnswered || activeTeamId === null) return;
     const option = scenario.options.find((o) => o.id === optionId);
     if (!option) return;
 
@@ -43,11 +46,12 @@ export default function QuizQuestion({
       setCorrectId(optionId);
       sound.playCorrect();
       setShowBurst(true);
-      onCorrectAnswer(POINTS_PER_QUESTION);
+      onTeamScored(activeTeamId);
     } else {
       setWrongIds((prev) => (prev.includes(optionId) ? prev : [...prev, optionId]));
       setShowHint(true);
       sound.playIncorrect();
+      setActiveTeamId(null); // Sai -> chuyển lượt, đội khác có thể giành trả lời.
     }
   };
 
@@ -60,9 +64,13 @@ export default function QuizQuestion({
     >
       {showBurst && <ConfettiBurst />}
 
-      <p className="text-sm font-bold uppercase tracking-wide text-violet-500">
-        Tình huống {questionNumber}/{totalQuestions}
-      </p>
+      <div className="flex flex-col gap-3">
+        <p className="text-sm font-bold uppercase tracking-wide text-violet-500">
+          Tình huống {questionNumber}/{totalQuestions}
+        </p>
+        <TeamScoreboard scores={teamScores} activeTeamId={activeTeamId} />
+      </div>
+
       <p className="text-xl font-extrabold leading-relaxed text-slate-800 sm:text-2xl">
         {scenario.situation}
       </p>
@@ -77,7 +85,7 @@ export default function QuizQuestion({
             <button
               key={option.id}
               type="button"
-              disabled={isAnswered || isWrong}
+              disabled={isAnswered || isWrong || activeTeamId === null}
               onClick={() => handleSelect(option.id)}
               className={`flex items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-base font-semibold transition sm:text-lg ${
                 isRightAnswer
@@ -85,7 +93,9 @@ export default function QuizQuestion({
                   : isWrong
                     ? "border-rose-300 bg-rose-50 text-rose-500"
                     : "border-slate-200 bg-white text-slate-700 hover:border-violet-300 hover:bg-violet-50"
-              } ${isDimmed ? "opacity-50" : ""} ${isWrong ? "opacity-70" : ""}`}
+              } ${isDimmed ? "opacity-50" : ""} ${isWrong ? "opacity-70" : ""} ${
+                activeTeamId === null && !isAnswered ? "opacity-60" : ""
+              }`}
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold uppercase">
                 {option.id}
@@ -131,6 +141,12 @@ export default function QuizQuestion({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {!isAnswered && activeTeamId === null && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center rounded-3xl bg-white/90 p-4">
+          <TeamPicker prompt="Đội nào trả lời?" onSelectTeam={setActiveTeamId} />
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -39,21 +39,18 @@ export type GameStage =
 
 export type GameMode = "full" | "practice";
 
-export type Stage1Result = {
+export type Stage1Stats = {
   pairsFound: number;
   totalPairs: number;
   timeUsedSeconds: number;
-  score: number;
 };
 
-export type Stage2Result = {
-  score: number;
+export type Stage2Stats = {
   correctCount: number;
   totalScenarios: number;
 };
 
-export type Stage3Result = {
-  score: number;
+export type Stage3Stats = {
   correctCount: number;
   totalCards: number;
 };
