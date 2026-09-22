@@ -24,6 +24,7 @@ export default function DraggableSituationCard({
 }: DraggableSituationCardProps) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const wrongFlash = useMotionValue(0);
 
   useEffect(() => {
     if (returnSignal === 0) return;
@@ -33,6 +34,7 @@ export default function DraggableSituationCard({
       ease: "easeInOut",
     });
     animate(y, 0, { type: "spring", stiffness: 260, damping: 20 });
+    animate(wrongFlash, [1, 1, 0], { duration: 0.6, times: [0, 0.5, 1] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [returnSignal]);
 
@@ -50,11 +52,18 @@ export default function DraggableSituationCard({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.6 }}
       transition={{ duration: 0.3 }}
-      className={`flex w-full max-w-sm touch-none items-center justify-center rounded-2xl border-4 border-violet-200 bg-white p-6 text-center shadow-xl sm:max-w-md ${
+      className={`relative flex w-full max-w-sm touch-none items-center justify-center rounded-2xl border-4 border-violet-200 bg-white p-6 text-center shadow-xl sm:max-w-md ${
         disabled ? "pointer-events-none opacity-70" : "cursor-grab active:cursor-grabbing"
       }`}
     >
-      <p className="text-lg font-bold leading-relaxed text-slate-700 sm:text-xl">{text}</p>
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-2xl border-4 border-rose-400 bg-rose-50"
+        style={{ opacity: wrongFlash }}
+      />
+      <p className="relative text-lg font-bold leading-relaxed text-slate-700 sm:text-xl">
+        {text}
+      </p>
     </motion.div>
   );
 }
