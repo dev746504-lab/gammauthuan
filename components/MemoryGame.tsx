@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Card from "./Card";
 import Timer from "./Timer";
 import TeamScoreboard from "./TeamScoreboard";
-import TeamPicker from "./TeamPicker";
 import ConfettiBurst from "./ConfettiBurst";
 import wordPairsData from "@/data/wordPairs.json";
 import { useGameSound } from "./SoundProvider";
@@ -31,18 +30,17 @@ function buildShuffledDeck(): DeckCard[] {
 
 type MemoryGameProps = {
   teamScores: number[];
-  onTeamScored: (teamId: number) => void;
+  onAdjustTeamScore: (teamId: number, delta: number) => void;
   onComplete: (stats: Stage1Stats) => void;
 };
 
-export default function MemoryGame({ teamScores, onTeamScored, onComplete }: MemoryGameProps) {
+export default function MemoryGame({ teamScores, onAdjustTeamScore, onComplete }: MemoryGameProps) {
   const [deck] = useState<DeckCard[]>(() => buildShuffledDeck());
   const [flippedIds, setFlippedIds] = useState<string[]>([]);
   const [matchedPairIds, setMatchedPairIds] = useState<number[]>([]);
   const [secondsLeft, setSecondsLeft] = useState(GAME_DURATION_SECONDS);
   const [isLocked, setIsLocked] = useState(false);
   const [showBurst, setShowBurst] = useState(false);
-  const [activeTeamId, setActiveTeamId] = useState<number | null>(null);
   const finishedRef = useRef(false);
   const sound = useGameSound();
 
@@ -74,7 +72,6 @@ export default function MemoryGame({ teamScores, onTeamScored, onComplete }: Mem
   }, [isComplete, secondsLeft, finishGame]);
 
   const handleCardClick = (card: DeckCard) => {
-    if (activeTeamId === null) return;
     if (isLocked || flippedIds.includes(card.cardId) || matchedPairIds.includes(card.pairId)) return;
     sound.playFlip();
     const nextFlipped = [...flippedIds, card.cardId];
@@ -84,25 +81,21 @@ export default function MemoryGame({ teamScores, onTeamScored, onComplete }: Mem
       setIsLocked(true);
       const first = deck.find((c) => c.cardId === nextFlipped[0])!;
       const second = deck.find((c) => c.cardId === nextFlipped[1])!;
-      const scoringTeamId = activeTeamId;
 
       if (first.pairId === second.pairId) {
         setTimeout(() => {
           setMatchedPairIds((prev) => [...prev, first.pairId]);
-          onTeamScored(scoringTeamId);
           setFlippedIds([]);
           setIsLocked(false);
           sound.playCorrect();
           setShowBurst(true);
           setTimeout(() => setShowBurst(false), 900);
-          // Ghép đúng -> đội này được lật tiếp, không đổi lượt.
         }, 350);
       } else {
         setTimeout(() => {
           setFlippedIds([]);
           setIsLocked(false);
           sound.playIncorrect();
-          setActiveTeamId(null); // Sai -> chuyển lượt, chọn đội khác.
         }, 1000);
       }
     }
@@ -111,7 +104,7 @@ export default function MemoryGame({ teamScores, onTeamScored, onComplete }: Mem
   return (
     <div className="relative mx-auto flex w-full max-w-xl flex-col gap-3 px-4 sm:max-w-2xl">
       <div className="flex w-full flex-col gap-2">
-        <TeamScoreboard scores={teamScores} activeTeamId={activeTeamId} />
+        <TeamScoreboard scores={teamScores} onAdjustScore={onAdjustTeamScore} />
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm font-bold text-white drop-shadow sm:text-base">
             Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
@@ -131,17 +124,11 @@ export default function MemoryGame({ teamScores, onTeamScored, onComplete }: Mem
               emoji={card.emoji}
               isFlipped={flippedIds.includes(card.cardId)}
               isMatched={matchedPairIds.includes(card.pairId)}
-              disabled={isLocked || activeTeamId === null}
+              disabled={isLocked}
               onClick={() => handleCardClick(card)}
             />
           ))}
         </div>
-
-        {activeTeamId === null && !isComplete && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center rounded-3xl bg-white/90 p-4">
-            <TeamPicker prompt="Đội nào lật thẻ?" onSelectTeam={setActiveTeamId} />
-          </div>
-        )}
       </div>
     </div>
   );

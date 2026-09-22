@@ -17,7 +17,8 @@ import { useGameState } from "@/hooks/useGameState";
 
 export default function Home() {
   const { state, dispatch } = useGameState();
-  const onTeamScored = (teamId: number) => dispatch({ type: "SCORE_TEAM", teamId });
+  const onAdjustTeamScore = (teamId: number, delta: number) =>
+    dispatch({ type: "ADJUST_TEAM_SCORE", teamId, delta });
 
   return (
     <SoundProvider>
@@ -51,7 +52,7 @@ export default function Home() {
             <motion.div key="stage1" exit={{ opacity: 0 }} className="w-full">
               <MemoryGame
                 teamScores={state.teamScores}
-                onTeamScored={onTeamScored}
+                onAdjustTeamScore={onAdjustTeamScore}
                 onComplete={(stats) => dispatch({ type: "FINISH_STAGE1", stats })}
               />
             </motion.div>
@@ -78,7 +79,7 @@ export default function Home() {
             <motion.div key="stage2" exit={{ opacity: 0 }} className="w-full">
               <QuizGame
                 teamScores={state.teamScores}
-                onTeamScored={onTeamScored}
+                onAdjustTeamScore={onAdjustTeamScore}
                 onComplete={(stats) => dispatch({ type: "FINISH_STAGE2", stats })}
               />
             </motion.div>
@@ -99,7 +100,7 @@ export default function Home() {
             <motion.div key="stage3" exit={{ opacity: 0 }} className="w-full">
               <ConflictSortStage
                 teamScores={state.teamScores}
-                onTeamScored={onTeamScored}
+                onAdjustTeamScore={onAdjustTeamScore}
                 onComplete={(stats) => dispatch({ type: "FINISH_STAGE3", stats })}
               />
             </motion.div>

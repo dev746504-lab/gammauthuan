@@ -10,20 +10,19 @@ const scenarios = scenariosData as Scenario[];
 
 type QuizGameProps = {
   teamScores: number[];
-  onTeamScored: (teamId: number) => void;
+  onAdjustTeamScore: (teamId: number, delta: number) => void;
   onComplete: (stats: Stage2Stats) => void;
 };
 
-export default function QuizGame({ teamScores, onTeamScored, onComplete }: QuizGameProps) {
+export default function QuizGame({ teamScores, onAdjustTeamScore, onComplete }: QuizGameProps) {
   const [index, setIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
 
   const current = scenarios[index];
   const isLast = index === scenarios.length - 1;
 
-  const handleTeamScored = (teamId: number) => {
+  const handleCorrectAnswer = () => {
     setCorrectCount((c) => c + 1);
-    onTeamScored(teamId);
   };
 
   const handleNext = () => {
@@ -44,7 +43,8 @@ export default function QuizGame({ teamScores, onTeamScored, onComplete }: QuizG
           totalQuestions={scenarios.length}
           isLast={isLast}
           teamScores={teamScores}
-          onTeamScored={handleTeamScored}
+          onAdjustTeamScore={onAdjustTeamScore}
+          onCorrectAnswer={handleCorrectAnswer}
           onNext={handleNext}
         />
       </AnimatePresence>

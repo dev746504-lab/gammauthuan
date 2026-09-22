@@ -17,7 +17,7 @@ export type GameAction =
   | { type: "START_GAME" }
   | { type: "SHOW_STAGE_SELECT" }
   | { type: "START_PRACTICE_STAGE"; stageNumber: 1 | 2 | 3 }
-  | { type: "SCORE_TEAM"; teamId: number }
+  | { type: "ADJUST_TEAM_SCORE"; teamId: number; delta: number }
   | { type: "FINISH_STAGE1"; stats: Stage1Stats }
   | { type: "CONTINUE_TO_TRANSITION" }
   | { type: "START_STAGE2" }
@@ -57,9 +57,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         stage2Stats: null,
         stage3Stats: null,
       };
-    case "SCORE_TEAM": {
+    case "ADJUST_TEAM_SCORE": {
       const nextScores = [...state.teamScores];
-      nextScores[action.teamId] = (nextScores[action.teamId] ?? 0) + 1;
+      nextScores[action.teamId] = Math.max(0, (nextScores[action.teamId] ?? 0) + action.delta);
       return { ...state, teamScores: nextScores };
     }
     case "FINISH_STAGE1":
