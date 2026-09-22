@@ -163,31 +163,34 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
           />
         </div>
 
-        <AnimatePresence>
-          {wrongHint && (
-            <motion.p
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-center text-base font-semibold text-amber-600"
-            >
-              💡 Thử nghĩ lại xem nhé!
-            </motion.p>
-          )}
-        </AnimatePresence>
+        {/* Chiều cao cố định để vùng thông báo không làm khung đổi kích thước và dịch chuyển thẻ. */}
+        <div className="mt-4 min-h-[76px] sm:min-h-[64px]">
+          <AnimatePresence>
+            {wrongHint && (
+              <motion.p
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="rounded-2xl bg-amber-50 px-4 py-3 text-center text-base font-semibold text-amber-600"
+              >
+                💡 Thử nghĩ lại xem nhé!
+              </motion.p>
+            )}
+          </AnimatePresence>
 
-        <AnimatePresence>
-          {feedback && (
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-center text-base font-semibold text-emerald-700 sm:text-lg"
-            >
-              🎉 {feedback}
-            </motion.p>
-          )}
-        </AnimatePresence>
+          <AnimatePresence>
+            {feedback && (
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-base font-semibold text-emerald-700 sm:text-lg"
+              >
+                🎉 {feedback}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
