@@ -4,7 +4,15 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Scenario } from "@/lib/types";
 import { useGameSound } from "./SoundProvider";
+import { useSpeech } from "@/hooks/useSpeech";
 import ConfettiBurst from "./ConfettiBurst";
+
+function buildQuestionSpeech(scenario: Scenario): string {
+  const optionLines = scenario.options
+    .map((option) => `Đáp án ${option.id.toUpperCase()}: ${option.text}.`)
+    .join(" ");
+  return `${scenario.situation} ${optionLines}`;
+}
 
 type QuizQuestionProps = {
   scenario: Scenario;
@@ -28,6 +36,7 @@ export default function QuizQuestion({
   const [showHint, setShowHint] = useState(false);
   const [showBurst, setShowBurst] = useState(false);
   const sound = useGameSound();
+  const speech = useSpeech();
 
   const correctOption = scenario.options.find((o) => o.correct);
   const isAnswered = correctId !== null;
@@ -58,9 +67,21 @@ export default function QuizQuestion({
     >
       {showBurst && <ConfettiBurst />}
 
-      <p className="text-sm font-bold uppercase tracking-wide text-violet-500">
-        Tình huống {questionNumber}/{totalQuestions}
-      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-bold uppercase tracking-wide text-violet-500">
+          Tình huống {questionNumber}/{totalQuestions}
+        </p>
+        <button
+          type="button"
+          onClick={() => speech.toggle(buildQuestionSpeech(scenario))}
+          aria-label={speech.isSpeaking ? "Dừng đọc" : "Đọc to câu hỏi"}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl shadow-md transition hover:scale-105 active:scale-95 ${
+            speech.isSpeaking ? "animate-pulse bg-violet-500 text-white" : "bg-violet-50 text-violet-600"
+          }`}
+        >
+          {speech.isSpeaking ? "⏹️" : "🔊"}
+        </button>
+      </div>
 
       <p className="text-xl font-extrabold leading-relaxed text-slate-800 sm:text-2xl">
         {scenario.situation}
@@ -117,9 +138,23 @@ export default function QuizQuestion({
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-start gap-3 rounded-2xl bg-emerald-50 p-5"
           >
-            <p className="text-base font-semibold text-emerald-700 sm:text-lg">
-              🎉 {correctOption?.explanation}
-            </p>
+            <div className="flex items-start gap-2">
+              <p className="flex-1 text-base font-semibold text-emerald-700 sm:text-lg">
+                🎉 {correctOption?.explanation}
+              </p>
+              <button
+                type="button"
+                onClick={() => correctOption?.explanation && speech.toggle(correctOption.explanation)}
+                aria-label={speech.isSpeaking ? "Dừng đọc" : "Nghe lời giải thích"}
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg shadow-md transition hover:scale-105 active:scale-95 ${
+                  speech.isSpeaking
+                    ? "animate-pulse bg-emerald-500 text-white"
+                    : "bg-white text-emerald-600"
+                }`}
+              >
+                {speech.isSpeaking ? "⏹️" : "🔊"}
+              </button>
+            </div>
             <button
               type="button"
               onClick={onNext}
