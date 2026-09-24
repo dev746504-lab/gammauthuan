@@ -32,7 +32,7 @@ export default function QuizGame({ onComplete }: QuizGameProps) {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-4">
+    <div className="mx-auto mt-12 flex w-full max-w-3xl flex-col items-center gap-4 px-4 sm:mt-0">
       <AnimatePresence mode="wait">
         <QuizQuestion
           key={current.id}
