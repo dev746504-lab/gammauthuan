@@ -63,19 +63,19 @@ export default function QuizQuestion({
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30 }}
-      className="relative mx-auto flex w-full max-w-3xl flex-col gap-5 rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+      className="relative mx-auto flex w-full max-w-4xl flex-col gap-5 rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
     >
       {showBurst && <ConfettiBurst />}
 
       <div className="flex items-center justify-between gap-2">
-        <p className="text-base font-bold uppercase tracking-wide text-violet-500 sm:text-lg">
+        <p className="text-lg font-bold uppercase tracking-wide text-violet-500 sm:text-xl">
           Tình huống {questionNumber}/{totalQuestions}
         </p>
         <button
           type="button"
           onClick={() => speech.toggle(buildQuestionSpeech(scenario))}
           aria-label={speech.isSpeaking ? "Dừng đọc" : "Đọc to câu hỏi"}
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-2xl shadow-md transition hover:scale-105 active:scale-95 sm:h-12 sm:w-12 ${
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-3xl shadow-md transition hover:scale-105 active:scale-95 sm:h-14 sm:w-14 ${
             speech.isSpeaking ? "animate-pulse bg-violet-500 text-white" : "bg-violet-50 text-violet-600"
           }`}
         >
@@ -83,7 +83,7 @@ export default function QuizQuestion({
         </button>
       </div>
 
-      <p className="text-2xl font-extrabold leading-relaxed text-slate-800 sm:text-3xl">
+      <p className="text-3xl font-extrabold leading-relaxed text-slate-800 sm:text-4xl">
         {scenario.situation}
       </p>
 
@@ -99,7 +99,7 @@ export default function QuizQuestion({
               type="button"
               disabled={isAnswered || isWrong}
               onClick={() => handleSelect(option.id)}
-              className={`flex items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-lg font-semibold transition sm:text-xl ${
+              className={`flex items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-xl font-semibold transition sm:text-2xl ${
                 isRightAnswer
                   ? "border-emerald-400 bg-emerald-50 text-emerald-700"
                   : isWrong
@@ -107,12 +107,12 @@ export default function QuizQuestion({
                     : "border-slate-200 bg-white text-slate-700 hover:border-violet-300 hover:bg-violet-50"
               } ${isDimmed ? "opacity-50" : ""} ${isWrong ? "opacity-70" : ""}`}
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-base font-bold uppercase sm:h-10 sm:w-10">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-lg font-bold uppercase sm:h-11 sm:w-11">
                 {option.id}
               </span>
               <span className="flex-1">{option.text}</span>
-              {isRightAnswer && <span className="text-3xl">✅</span>}
-              {isWrong && <span className="text-3xl">🤔</span>}
+              {isRightAnswer && <span className="text-4xl">✅</span>}
+              {isWrong && <span className="text-4xl">🤔</span>}
             </button>
           );
         })}
@@ -124,7 +124,7 @@ export default function QuizQuestion({
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="rounded-2xl bg-amber-50 px-4 py-3 text-lg font-semibold text-amber-600"
+            className="rounded-2xl bg-amber-50 px-4 py-3 text-xl font-semibold text-amber-600"
           >
             💡 {scenario.hint}
           </motion.p>
@@ -139,14 +139,14 @@ export default function QuizQuestion({
             className="flex flex-col items-start gap-3 rounded-2xl bg-emerald-50 p-5"
           >
             <div className="flex items-start gap-2">
-              <p className="flex-1 text-lg font-semibold text-emerald-700 sm:text-xl">
+              <p className="flex-1 text-xl font-semibold text-emerald-700 sm:text-2xl">
                 🎉 {correctOption?.explanation}
               </p>
               <button
                 type="button"
                 onClick={() => correctOption?.explanation && speech.toggle(correctOption.explanation)}
                 aria-label={speech.isSpeaking ? "Dừng đọc" : "Nghe lời giải thích"}
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl shadow-md transition hover:scale-105 active:scale-95 ${
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-2xl shadow-md transition hover:scale-105 active:scale-95 ${
                   speech.isSpeaking
                     ? "animate-pulse bg-emerald-500 text-white"
                     : "bg-white text-emerald-600"
@@ -158,7 +158,7 @@ export default function QuizQuestion({
             <button
               type="button"
               onClick={onNext}
-              className="rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-8 py-3 text-xl font-bold text-white shadow-lg transition hover:scale-105 active:scale-95"
+              className="rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-10 py-4 text-2xl font-bold text-white shadow-lg transition hover:scale-105 active:scale-95"
             >
               {isLast ? "Xem kết quả" : "Tình huống tiếp theo"}
             </button>
