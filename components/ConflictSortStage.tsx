@@ -12,7 +12,7 @@ import type { ConflictSituation, Stage3Stats } from "@/lib/types";
 
 const situations = conflictSituationsData as ConflictSituation[];
 const TOTAL_CARDS = situations.length;
-const STAGE_DURATION_SECONDS = 90;
+const STAGE_DURATION_SECONDS = 180;
 const ADVANCE_DELAY_MS = 1300;
 const WRONG_HINT_DURATION_MS = 1600;
 
@@ -111,9 +111,9 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
   };
 
   return (
-    <div className="relative mx-auto flex w-full max-w-xl flex-col gap-3 px-4 sm:max-w-2xl">
+    <div className="relative mx-auto mt-10 flex w-full max-w-xl flex-col gap-3 px-4 sm:mt-0 sm:max-w-3xl">
       <div className="flex w-full items-center justify-between gap-2">
-        <p className="text-sm font-bold text-white drop-shadow sm:text-base">
+        <p className="text-sm font-bold text-white drop-shadow sm:text-lg">
           Đã phân loại {correctCount}/{TOTAL_CARDS} thẻ
         </p>
         <Timer secondsLeft={secondsLeft} />
@@ -125,7 +125,7 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
       >
         {showBurst && <ConfettiBurst />}
 
-        <p className="mb-4 text-center text-sm font-semibold text-slate-500 sm:text-base">
+        <p className="mb-4 text-center text-base font-semibold text-slate-500 sm:text-lg">
           ✋ Kéo thẻ vào đúng khu vực nhé!
         </p>
 
@@ -164,14 +164,14 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
         </div>
 
         {/* Chiều cao cố định để vùng thông báo không làm khung đổi kích thước và dịch chuyển thẻ. */}
-        <div className="mt-4 min-h-[76px] sm:min-h-[64px]">
+        <div className="mt-4 min-h-[92px] sm:min-h-[76px]">
           <AnimatePresence>
             {wrongHint && (
               <motion.p
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="rounded-2xl bg-amber-50 px-4 py-3 text-center text-base font-semibold text-amber-600"
+                className="rounded-2xl bg-amber-50 px-4 py-3 text-center text-lg font-semibold text-amber-600"
               >
                 💡 Thử nghĩ lại xem nhé!
               </motion.p>
@@ -184,7 +184,7 @@ export default function ConflictSortStage({ onComplete }: ConflictSortStageProps
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-base font-semibold text-emerald-700 sm:text-lg"
+                className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-lg font-semibold text-emerald-700 sm:text-xl"
               >
                 🎉 {feedback}
               </motion.p>

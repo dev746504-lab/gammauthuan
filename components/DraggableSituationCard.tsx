@@ -52,7 +52,7 @@ export default function DraggableSituationCard({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.6 }}
       transition={{ duration: 0.3 }}
-      className={`relative flex w-full max-w-sm touch-none items-center justify-center rounded-2xl border-4 border-violet-200 bg-white p-6 text-center shadow-xl sm:max-w-md ${
+      className={`relative flex w-full max-w-md touch-none items-center justify-center rounded-2xl border-4 border-violet-200 bg-white p-6 text-center shadow-xl sm:max-w-lg ${
         disabled ? "pointer-events-none opacity-70" : "cursor-grab active:cursor-grabbing"
       }`}
     >
@@ -61,7 +61,7 @@ export default function DraggableSituationCard({
         className="pointer-events-none absolute inset-0 rounded-2xl border-4 border-rose-400 bg-rose-50"
         style={{ opacity: wrongFlash }}
       />
-      <p className="relative text-lg font-bold leading-relaxed text-slate-700 sm:text-xl">
+      <p className="relative text-xl font-bold leading-relaxed text-slate-700 sm:text-2xl">
         {text}
       </p>
     </motion.div>

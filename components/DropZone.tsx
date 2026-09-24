@@ -19,12 +19,12 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(function DropZone(
   return (
     <div
       ref={ref}
-      className={`flex w-full shrink-0 flex-col items-center justify-center gap-1 rounded-2xl border-4 border-dashed px-4 py-5 text-center transition-all duration-200 sm:w-48 ${
+      className={`flex w-full shrink-0 flex-col items-center justify-center gap-1 rounded-2xl border-4 border-dashed px-4 py-5 text-center transition-all duration-200 sm:w-56 ${
         TONE_CLASSES[tone]
       } ${isActive ? "scale-105 border-solid shadow-lg" : ""}`}
     >
-      <span className="text-3xl sm:text-4xl">{icon}</span>
-      <span className="text-sm font-bold sm:text-base">{label}</span>
+      <span className="text-4xl sm:text-5xl">{icon}</span>
+      <span className="text-base font-bold sm:text-lg">{label}</span>
     </div>
   );
 });
