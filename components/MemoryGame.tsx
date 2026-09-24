@@ -1,14 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Card from "./Card";
-import Timer from "./Timer";
 import ConfettiBurst from "./ConfettiBurst";
 import wordPairsData from "@/data/wordPairs.json";
 import { useGameSound } from "./SoundProvider";
 import type { Stage1Stats, WordCardData } from "@/lib/types";
-
-const GAME_DURATION_SECONDS = 300;
 
 const wordPairs = wordPairsData as WordCardData[];
 const TOTAL_PAIRS = wordPairs.length / 2;
@@ -35,7 +32,6 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
   const [deck] = useState<DeckCard[]>(() => buildShuffledDeck());
   const [flippedIds, setFlippedIds] = useState<string[]>([]);
   const [matchedPairIds, setMatchedPairIds] = useState<number[]>([]);
-  const [secondsLeft, setSecondsLeft] = useState(GAME_DURATION_SECONDS);
   const [isLocked, setIsLocked] = useState(false);
   const [showBurst, setShowBurst] = useState(false);
   const finishedRef = useRef(false);
@@ -43,30 +39,14 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
 
   const isComplete = matchedPairIds.length === TOTAL_PAIRS;
 
-  const finishGame = useCallback(() => {
-    if (finishedRef.current) return;
+  useEffect(() => {
+    if (!isComplete || finishedRef.current) return;
     finishedRef.current = true;
-    onComplete({
-      pairsFound: matchedPairIds.length,
-      totalPairs: TOTAL_PAIRS,
-      timeUsedSeconds: GAME_DURATION_SECONDS - secondsLeft,
-    });
-  }, [matchedPairIds.length, secondsLeft, onComplete]);
-
-  useEffect(() => {
-    if (isComplete || secondsLeft <= 0) return;
-    const timerId = setInterval(() => {
-      setSecondsLeft((s) => Math.max(0, s - 1));
-    }, 1000);
-    return () => clearInterval(timerId);
-  }, [isComplete, secondsLeft]);
-
-  useEffect(() => {
-    if (!isComplete && secondsLeft > 0) return;
-    const delay = isComplete ? 700 : 0;
-    const t = setTimeout(finishGame, delay);
+    const t = setTimeout(() => {
+      onComplete({ pairsFound: matchedPairIds.length, totalPairs: TOTAL_PAIRS });
+    }, 700);
     return () => clearTimeout(t);
-  }, [isComplete, secondsLeft, finishGame]);
+  }, [isComplete, matchedPairIds.length, onComplete]);
 
   const handleCardClick = (card: DeckCard) => {
     if (isLocked || flippedIds.includes(card.cardId) || matchedPairIds.includes(card.pairId)) return;
@@ -100,12 +80,9 @@ export default function MemoryGame({ onComplete }: MemoryGameProps) {
 
   return (
     <div className="relative mx-auto flex w-full max-w-xl flex-col gap-3 px-4 sm:max-w-2xl">
-      <div className="flex w-full items-center justify-between gap-2">
-        <p className="text-sm font-bold text-white drop-shadow sm:text-base">
-          Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
-        </p>
-        <Timer secondsLeft={secondsLeft} />
-      </div>
+      <p className="text-center text-sm font-bold text-white drop-shadow sm:text-base">
+        Đã ghép {matchedPairIds.length}/{TOTAL_PAIRS} cặp
+      </p>
 
       <div className="relative w-full rounded-3xl bg-white/95 p-3 shadow-2xl sm:p-4">
         {showBurst && <ConfettiBurst />}

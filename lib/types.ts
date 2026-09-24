@@ -38,7 +38,6 @@ export type GameStage =
 export type Stage1Stats = {
   pairsFound: number;
   totalPairs: number;
-  timeUsedSeconds: number;
 };
 
 export type Stage2Stats = {

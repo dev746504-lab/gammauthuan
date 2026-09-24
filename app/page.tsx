@@ -51,7 +51,6 @@ export default function Home() {
               <ResultScreen
                 pairsFound={state.stage1Stats.pairsFound}
                 totalPairs={state.stage1Stats.totalPairs}
-                timeUsedSeconds={state.stage1Stats.timeUsedSeconds}
                 onContinue={backToStageSelect}
               />
             </motion.div>
